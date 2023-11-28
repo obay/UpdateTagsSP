@@ -1,0 +1,29 @@
+name: PowerShell Script Workflow
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**.ps1'
+      - '**.csv'
+
+jobs:
+  run-powershell-script:
+    runs-on: windows-latest
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Install Azure PowerShell module
+      shell: pwsh
+      run: |
+        if (-not (Get-Module -Name Az -ListAvailable)) {
+          Install-Module -Name Az -AllowClobber -Scope CurrentUser -Force
+        }
+
+    - name: Run UpdateTags.ps1 script
+      continue-on-error: true
+      run: |
+        ./UpdateTags.ps1 -TenantId "${{ secrets.AZURE_TENANT_ID }}" -AppId "${{ secrets.AZURE_CLIENT_ID }}" -Password "${{ secrets.AZURE_CLIENT_SECRET }}" -CSVFilePath "${{ github.workspace }}/${{ vars.CSV_FILE_PATH }}"
