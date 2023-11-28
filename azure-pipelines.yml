@@ -1,0 +1,25 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+variables:
+  azureTenantId: $(AZURE_TENANT_ID)
+  azureAppId: $(AZURE_APP_ID)
+  azurePassword: $(AZURE_PASSWORD)
+
+steps:  
+- task: AzurePowerShell@5
+  displayName: Update Azure Tags
+  inputs:
+    azureSubscription: 'Obay Lab - Azure Infrastructure Subscription'
+    ScriptType: 'FilePath'
+    ScriptPath: './UpdateTags.ps1'
+    ScriptArguments: '-CSVFilePath ./AzureResources.csv -TenantId $(azureTenantId) -AppId $(azureAppId) -Password $(azurePassword)'
+    azurePowerShellVersion: 'LatestVersion'
